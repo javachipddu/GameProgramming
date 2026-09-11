@@ -29,7 +29,8 @@ void draw_square(int size)
 		b[i]=0xa0+i;
 		
 	printf("%c%c",a, b[3]);
-for(i=0;i<size;i++)
+	
+	for(i=0;i<size;i++)
 		printf("%c%c", a, b[1]);
 	printf("%c%c", a, b[4]);
 	printf("\n");
