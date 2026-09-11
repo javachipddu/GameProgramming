@@ -12,3 +12,11 @@
 6. fgets(string, sizeof(string), stdin); 문자열 입력을 fgets로 받는다. 그러나 입력 시 사이즈를 오버하면 똑같은 문제가 발생한다.그리고 사이즈를 오버하지 않더라도 문자열 끝에 개행문자가 추가된다. 그래서 다음 줄에 string[strlen(string)-1] = '\0'; 로 강제로 널문자를 넣어준다.
 7. scanf("%*c", c); %*c는 입력은 받지만 저장은 안한다. 즉 비어있는 \n를 날려버린다.
 8. scanf("%c", &c);에서 %c 앞에 공백을 추가하기 : scanf(" %c", &c);
+
+---
+
+<img width="806" height="453" alt="image" src="https://github.com/user-attachments/assets/5b0356d5-b869-4992-832e-804f7528828e" />
+
+---
+
+<img width="811" height="855" alt="image" src="https://github.com/user-attachments/assets/79689c9e-46a8-4807-840a-c52ae40bf085" />
