@@ -69,8 +69,13 @@ vba(Visual Basic Application)
 
 ♠ 자체 → 2바이트
 
-문자열 종료 표시 '\0' → 1바이트
+문자열 종료 표시 '\0'(null문자) → 1바이트
 
 ────────────────────
 
 총 3바이트
+
+<img width="625" height="351" alt="image" src="https://github.com/user-attachments/assets/d6fb54ad-786c-4193-9bb8-69fa014f8f50" />
+
+<img width="626" height="353" alt="image" src="https://github.com/user-attachments/assets/ec3e71f5-fe64-4d2c-a1c2-e9560ec616fc" />
+
