@@ -51,3 +51,14 @@ vba(Visual Basic Application)
 <img width="626" height="351" alt="image" src="https://github.com/user-attachments/assets/c5786481-99ab-40aa-8fbb-7224370d9599" />
 
 <img width="624" height="352" alt="image" src="https://github.com/user-attachments/assets/0d966bd5-7d07-44c1-b46e-92c54c7e95fc" />
+
+• 가변 인수를 사용하는 함수의 원형에는 고정적으로 사용할 매개 변수가
+최소한 한 개가 있어야 하고, 이후에 콤마와 ...를 함께 정의해야 한다.
+• printf와 scanf의 경우에는 고정적으로 사용할 매개 변수는 한 개이고, 이
+는 형식 제어 문자열을 정의하는 부분
+• 함수 원형에서 ...로 표시되는 가변 인수를 사용하려면 va_list라는 데이터
+형을 이용하며 va_list 형은 헤더 파일 <stdarg.h>에 정의되어 있다.
+• va_list 형은 가변 인수를 처리하는데 있어서 필요한 정보를 보관할 포인
+터 변수를 정의하기 위해 사용
+
+<img width="626" height="714" alt="image" src="https://github.com/user-attachments/assets/78603db5-2dca-4159-aa78-9bf551c69f80" />
