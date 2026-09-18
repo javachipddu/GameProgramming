@@ -62,3 +62,7 @@ vba(Visual Basic Application)
 터 변수를 정의하기 위해 사용
 
 <img width="626" height="714" alt="image" src="https://github.com/user-attachments/assets/78603db5-2dca-4159-aa78-9bf551c69f80" />
+
+<img width="625" height="708" alt="image" src="https://github.com/user-attachments/assets/abc0e2dd-a279-4630-b980-1d728062cfda" />
+
+<img width="623" height="353" alt="image" src="https://github.com/user-attachments/assets/c921ccc6-9d32-41d4-8e4b-59448dec24e0" />
