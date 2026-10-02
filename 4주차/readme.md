@@ -52,9 +52,9 @@ null 만날 때까지 출력한다
 
 <img width="628" height="347" alt="image" src="https://github.com/user-attachments/assets/91d6a452-142a-4d15-b161-0f1ab53bb076" />
 
-배열 / 동일한 데이터 타입의 연속적으로 저장하는 자료구조
-
 <img width="624" height="351" alt="image" src="https://github.com/user-attachments/assets/9447487b-2778-4a41-847f-666045310440" />
+
+배열 / 동일한 데이터 타입의 연속적으로 저장하는 자료구조
 
 <img width="624" height="346" alt="image" src="https://github.com/user-attachments/assets/cbd6675e-8d9c-44b6-aa8f-ad24816e38f2" />
 
