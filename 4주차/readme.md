@@ -32,7 +32,6 @@ parameter 개수가 세 개면 argument도 세 개다
 
 가변인수는 하나씩 처리해준다
 
-
 게임프로그래밍(c02)복습
 카드 표시
 문자형 배열
@@ -47,3 +46,16 @@ null 만날 때까지 출력한다
 <img width="626" height="351" alt="image" src="https://github.com/user-attachments/assets/6ee4e9d4-3f05-4229-9179-fdc3c2605389" />
 
 <img width="628" height="347" alt="image" src="https://github.com/user-attachments/assets/91d6a452-142a-4d15-b161-0f1ab53bb076" />
+
+배열 / 동일한 데이터 타입의 연속적으로 저장하는 자료구조
+
+<img width="624" height="351" alt="image" src="https://github.com/user-attachments/assets/9447487b-2778-4a41-847f-666045310440" />
+
+<img width="624" height="346" alt="image" src="https://github.com/user-attachments/assets/cbd6675e-8d9c-44b6-aa8f-ad24816e38f2" />
+
+<img width="622" height="346" alt="image" src="https://github.com/user-attachments/assets/9933c55b-4b1a-46f1-9d96-d4d5736c72ac" />
+
+컴퓨터에 실행되는 모든 프로그램은 스택이 이용된다고 봐도 좋다.
+
+<img width="471" height="194" alt="image" src="https://github.com/user-attachments/assets/d13d3027-6bac-451d-95a6-798e85755703" />
+
