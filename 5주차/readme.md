@@ -10,4 +10,5 @@
 <img width="837" height="509" alt="image" src="https://github.com/user-attachments/assets/e21e114c-f03c-4173-92dc-7a4da61e576a" />
 <img width="837" height="509" alt="image" src="https://github.com/user-attachments/assets/4b8e2cbb-be75-441b-b41f-483e6914a031" />
 ## 꼬리재귀(Tail Recursion)
+
 **꼬리재귀**는 재귀 함수가 자기 자신을 호출한 뒤, 그 결과를 추가로 계산하지 않고 바로 반환하는 재귀 방식이다.
