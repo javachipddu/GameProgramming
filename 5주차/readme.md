@@ -109,3 +109,7 @@ factorial(1, 24)
 <img width="837" height="509" alt="image" src="https://github.com/user-attachments/assets/1964a64f-0386-4002-8968-55c6c083c7cd" />
 <img width="837" height="509" alt="image" src="https://github.com/user-attachments/assets/d91546ca-aa4b-4db1-b4e3-27527fa03e58" />
 <img width="837" height="509" alt="image" src="https://github.com/user-attachments/assets/905121f6-20f2-4909-925f-98ad8d075702" />
+<img width="837" height="509" alt="image" src="https://github.com/user-attachments/assets/0c04fae6-38b6-421d-a98c-1def2f66e915" />
+<img width="837" height="509" alt="image" src="https://github.com/user-attachments/assets/9df85a62-a4cd-461f-aa05-30908256088b" />
+<img width="837" height="509" alt="image" src="https://github.com/user-attachments/assets/d80fca1e-bbd0-45fc-8941-cfc5bc8fc111" />
+<img width="837" height="509" alt="image" src="https://github.com/user-attachments/assets/973d2849-e530-43c5-aa33-7f3156da20c2" />
