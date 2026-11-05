@@ -1,200 +1,232 @@
+
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
 #include <conio.h>
 #include <windows.h>
 
+// í•¨ìˆ˜ ì„ ì–¸
 long time_to_number(void);
 void number_check(int, int);
 void digit_print(int*, int);
 void gotoxy(int x, int y);
 void dot_print(int hour);
 
-//¹è¿­ one[]~¹è¿­ nine[]±îÁöÀÇ Á¤ÀÇ´Â [¿¹Á¦ 5.4.7]°ú [¿¹Á¦ 6.1.1]À» ÀÌ¿ë
+// ìˆ«ì 0~9ì˜ ëª¨ì–‘ì„ 5í–‰ 4ì—´ ë°°ì—´ë¡œ ì •ì˜
 int zero[20] =
-	{1,1,1,1,
-	 1,0,0,1,
-	 1,0,0,1,
-	 1,0,0,1,
-	 1,1,1,1};
+{
+    1,1,1,1,
+    1,0,0,1,
+    1,0,0,1,
+    1,0,0,1,
+    1,1,1,1
+};
 
-int one[20]=
- {0,0,1,0,
-  0,0,1,0,
-  0,0,1,0,
-  0,0,1,0,
-  0,0,1,0};
+int one[20] =
+{
+    0,0,1,0,
+    0,0,1,0,
+    0,0,1,0,
+    0,0,1,0,
+    0,0,1,0
+};
 
-int two[20]=
- {1,1,1,1,
-  0,0,0,1,
-  1,1,1,1,
-  1,0,0,0,
-  1,1,1,1};
+int two[20] =
+{
+    1,1,1,1,
+    0,0,0,1,
+    1,1,1,1,
+    1,0,0,0,
+    1,1,1,1
+};
 
-int three[20]=
- {1,1,1,1,
-  0,0,0,1,
-  1,1,1,1,
-  0,0,0,1,
-  1,1,1,1};
+int three[20] =
+{
+    1,1,1,1,
+    0,0,0,1,
+    1,1,1,1,
+    0,0,0,1,
+    1,1,1,1
+};
 
-int four[20]=
- {1,0,0,1,
-  1,0,0,1,
-  1,1,1,1,
-  0,0,0,1,
-  0,0,0,1};
+int four[20] =
+{
+    1,0,0,1,
+    1,0,0,1,
+    1,1,1,1,
+    0,0,0,1,
+    0,0,0,1
+};
 
-int five[20]=
- {1,1,1,1,
-  1,0,0,0,
-  1,1,1,1,
-  0,0,0,1,
-  1,1,1,1};
+int five[20] =
+{
+    1,1,1,1,
+    1,0,0,0,
+    1,1,1,1,
+    0,0,0,1,
+    1,1,1,1
+};
 
-int six[20]=
- {1,0,0,0,
-  1,0,0,0,
-  1,1,1,1,
-  1,0,0,1,
-  1,1,1,1};
+int six[20] =
+{
+    1,0,0,0,
+    1,0,0,0,
+    1,1,1,1,
+    1,0,0,1,
+    1,1,1,1
+};
 
-int seven[20]=
- {1,1,1,1,
-  0,0,0,1,
-  0,0,0,1,
-  0,0,0,1,
-  0,0,0,1};
+int seven[20] =
+{
+    1,1,1,1,
+    0,0,0,1,
+    0,0,0,1,
+    0,0,0,1,
+    0,0,0,1
+};
 
-int eight[20]=
- {1,1,1,1,
-  1,0,0,1,
-  1,1,1,1,
-  1,0,0,1,
-  1,1,1,1};
+int eight[20] =
+{
+    1,1,1,1,
+    1,0,0,1,
+    1,1,1,1,
+    1,0,0,1,
+    1,1,1,1
+};
 
 int nine[20] =
-	{1,1,1,1,
-	 1,0,0,1,
-	 1,1,1,1,
-	 0,0,0,1,
-	 0,0,0,1};
+{
+    1,1,1,1,
+    1,0,0,1,
+    1,1,1,1,
+    0,0,0,1,
+    0,0,0,1
+};
 
-
+// ë©”ì¸ í•¨ìˆ˜
 int main(void)
 {
-	int line; 
-	long time_number;
-	printf("µğÁöÅĞ ½Ã°è ÇÁ·Î±×·¥\n\n");
-	printf("¾Æ¹«Å°³ª ´©¸£¸é ÇöÀç½Ã°£À» Ãâ·ÂÇÕ´Ï´Ù.\n");
-	getch();
-	system("cls");
-	while(!kbhit())
-	{
-		gotoxy(1,3);
-		time_number=time_to_number();
-		for(line=0;line<=4;line++)
-		{
-			number_check(time_number, line);
-			printf("\n");
-		}
-		dot_print(time_number);
-		printf("\n\n\n\n¾Æ¹«Å°³ª ´©¸£¸é Á¾·áÇÕ´Ï´Ù.\n");
-	}
-	return 0;
+    int line;
+    long time_number;
+
+    printf("ë””ì§€í„¸ ì‹œê³„ í”„ë¡œê·¸ë¨\n\n");
+    printf("ì•„ë¬´ í‚¤ë‚˜ ëˆ„ë¥´ë©´ í˜„ì¬ ì‹œê°„ì„ ì¶œë ¥í•©ë‹ˆë‹¤.\n");
+
+    getch();
+    system("cls");
+
+    while (!kbhit())
+    {
+        gotoxy(1, 3);
+
+        time_number = time_to_number();
+
+        for (line = 0; line <= 4; line++)
+        {
+            number_check((int)time_number, line);
+            printf("\n");
+        }
+
+        dot_print((int)time_number);
+
+        printf("\n\n\n\nì•„ë¬´ í‚¤ë‚˜ ëˆ„ë¥´ë©´ ì¢…ë£Œí•©ë‹ˆë‹¤.\n");
+    }
+
+    return 0;
 }
+
+// í˜„ì¬ ì‹œê°„ì„ HHMMSS í˜•íƒœë¡œ ë°˜í™˜
 long time_to_number(void)
 {
-	time_t current;
-	struct tm *d;
-	int hour, min, sec; 
-	current=time(NULL);
-	d=localtime(&current);
-	hour=d->tm_hour*10000;
-	min=d->tm_min*100;
-	sec=d->tm_sec;
-	return hour+min+sec;
+    time_t current;
+    struct tm *d;
+
+    int hour, min, sec;
+
+    current = time(NULL);
+    d = localtime(&current);
+
+    hour = d->tm_hour * 10000;
+    min = d->tm_min * 100;
+    sec = d->tm_sec;
+
+    return hour + min + sec;
 }
 
+// ìˆ«ìì˜ ê° ìë¦¿ìˆ˜ë¥¼ ë¶„ë¦¬í•˜ì—¬ ì¶œë ¥
 void number_check(int k, int i)
 {
- if (k>=1)
-  {
-     number_check(k/10, i);
-     switch(k%10)
-     {
-        case 0 : 
-	  digit_print(zero, i);
-	  break;
-        case 1 : 
-	  digit_print(one, i);
-	  break;
-        case 2 : 
-	  digit_print(two, i);
-	  break;
-        case 3 : 
-	  digit_print(three, i);
-	  break;
-        case 4 : 
-	  digit_print(four, i);
-	  break;
-        case 5 : 
-	  digit_print(five, i);
-	  break;
-        case 6 : 
-	  digit_print(six, i);
-	  break;
-        case 7 : 
-	  digit_print(seven, i);
-	  break;
-        case 8 : 
-	  digit_print(eight, i);
-	  break;
-        case 9 : 
-          digit_print(nine, i);
-	  break;
-     }
-  }
+    if (k >= 1)
+    {
+        number_check(k / 10, i);
+
+        switch (k % 10)
+        {
+            case 0: digit_print(zero, i); break;
+            case 1: digit_print(one, i); break;
+            case 2: digit_print(two, i); break;
+            case 3: digit_print(three, i); break;
+            case 4: digit_print(four, i); break;
+            case 5: digit_print(five, i); break;
+            case 6: digit_print(six, i); break;
+            case 7: digit_print(seven, i); break;
+            case 8: digit_print(eight, i); break;
+            case 9: digit_print(nine, i); break;
+        }
+    }
 }
-void digit_print(int dim[], int check)
+
+// ìˆ«ì ë°°ì—´ì˜ í•œ í–‰ì„ ì¶œë ¥
+void digit_print(int *dim, int check)
 {
- //[ÇÔ¼ö 5.4.8]ÀÇ Á¤ÀÇºÎºĞ Âü°í
- int i;
- for(i=line*4;i<=line*4+3; i++)
-  if (dim[i]==1)
-	 printf("¡á");
-  else
-	 printf("  ");
- printf("  ");
+    int i;
+
+    for (i = check * 4; i <= check * 4 + 3; i++)
+    {
+        if (dim[i] == 1)
+            printf("â– ");
+        else
+            printf("  ");
+    }
+
+    printf("  ");
 }
+
+// ì‹œê°„ êµ¬ë¶„ì  ì¶œë ¥
 void dot_print(int hour)
 {
-	int i;
-	if (hour<100000)
-	{
-		for(i=0;i<2;i++)
-		{
-			gotoxy(10+(i*27), 4);
-			printf("¡á");
-			gotoxy(10+(i*27), 6);
-			printf("¡á");
-		}
-	}
-	else
-	{
-		for(i=0;i<2;i++)
-		{
-			gotoxy(24+(i*26), 4);
-			printf("¡á");
-			gotoxy(24+(i*26), 6);
-			printf("¡á");
-		}
-	}
+    int i;
 
+    if (hour < 100000)
+    {
+        for (i = 0; i < 2; i++)
+        {
+            gotoxy(10 + (i * 27), 4);
+            printf("â– ");
+
+            gotoxy(10 + (i * 27), 6);
+            printf("â– ");
+        }
+    }
+    else
+    {
+        for (i = 0; i < 2; i++)
+        {
+            gotoxy(24 + (i * 26), 4);
+            printf("â– ");
+
+            gotoxy(24 + (i * 26), 6);
+            printf("â– ");
+        }
+    }
 }
+
+// ì½˜ì†” ì»¤ì„œ ìœ„ì¹˜ ì´ë™
 void gotoxy(int x, int y)
 {
-   COORD Pos = {x - 1, y - 1};
-   SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Pos);
+    COORD Pos = {x - 1, y - 1};
+
+    SetConsoleCursorPosition(
+        GetStdHandle(STD_OUTPUT_HANDLE), Pos
+    );
 }
