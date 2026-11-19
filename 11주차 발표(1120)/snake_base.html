@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Snake Upgrade - 최종본</title>
+<style>
+:root{--bg:#10151f;--fg:#e6edf3}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",sans-serif;text-align:center}
+body.light{--bg:#eef2f6;--fg:#10151f}
+h1{font-size:20px;margin:10px 0 4px}
+#hud{display:flex;justify-content:center;gap:14px;padding:6px;font-size:14px;flex-wrap:wrap}
+#hud b{color:#38bdf8}
+canvas{border:3px solid #38bdf8;border-radius:8px;max-width:96vw;touch-action:none}
+#toast{height:22px;color:#e8a317;font-weight:700}
+small{opacity:.7;display:block;padding:0 8px 12px}
+</style></head><body>
+<h1>SNAKE · 업그레이드 0/32</h1>
+<div id="hud">
+<span>점수 <b id="sc">0</b></span><span>최고 <b id="hi">0</b></span><span>레벨 <b id="lv">1</b></span>
+<span>길이 <b id="ln">3</b></span><span>콤보 <b id="cb">0</b></span><span>모드 <b id="md"></b></span>
+</div>
+<canvas id="c" width="480" height="480"></canvas>
+<div id="toast"></div>
+<small id="hint"></small>
+<script>
+const LV=0;
+const C=document.getElementById('c'),x=C.getContext('2d'),N=20,S=24,$=id=>document.getElementById(id);
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},
+ set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const D=[{n:'쉬움',s:150},{n:'보통',s:110},{n:'어려움',s:75}];
+let diff=1,wrap=false,sound=true,music=true,light=false,col1='#172033',col2='#1b263b';
+let sn,dir,q,apple,gold,poison,walls,items,score,lvl,eaten,combo,lastEat,fx,ach,tick=0,parts=[],shake=0,pend=[];
+let state=LV>=3?'menu':'play',best=LV>=2?store.get('best',0):0,rank=LV>=30?store.get('rank',[]):[],ttimer;
+/* 사운드 (Web Audio) */
+let AC;function beep(f,d=.1,t='square',v=.05){if(!sound||LV<20)return;try{AC=AC||new AudioContext();
+ const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;
+ o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
+const SC=[262,330,392,523,392,330];
+function toast(m){$('toast').textContent=m;clearTimeout(ttimer);ttimer=setTimeout(()=>$('toast').textContent='',2200)}
+function free(){let p;do{p={x:Math.random()*N|0,y:Math.random()*N|0}}while(
+ sn.some(s=>s.x==p.x&&s.y==p.y)||walls.some(s=>s.x==p.x&&s.y==p.y)||[apple,gold,poison,...items,...pend].some(s=>s&&s.x==p.x&&s.y==p.y));return p}
+function sp(kind,fn,n){const p=free();if(LV<32){fn(p,n);return}
+ if(['gold','poison','item'].includes(kind)&&pend.some(e=>e.kind==kind))return;pend.push({...p,kind,fn,at:n+1000})}
+function procPend(n){for(let i=pend.length-1;i>=0;i--){const e=pend[i];if(n>=e.at){pend.splice(i,1);let p={x:e.x,y:e.y};
+ if(sn.some(s=>s.x==p.x&&s.y==p.y))p=free();e.fn(p,e.at)}}}
+function reset(){sn=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];dir={x:1,y:0};q=[];walls=[];items=[];apple=null;gold=null;poison=null;
+ score=0;lvl=1;eaten=0;combo=0;lastEat=0;fx={};ach={};parts=[];pend=[];apple=free();hud()}
+function hv(){const g={sc:1,hi:2,lv:6,ln:1,cb:18,md:5};for(const k in g)$(k).parentNode.style.display=LV>=g[k]?'':'none';$('hud').style.display=LV>=1?'':'none'}
+function buildHint(){const a=['방향키'+(LV>=25?'/WASD':'')+' 이동'];if(LV>=3)a.push('Space 시작/일시정지(P)');if(LV>=7)a.push('1/2/3 난이도');if(LV>=5)a.push('B 벽통과');if(LV>=20)a.push('M 소리');if(LV>=21)a.push('N 음악');if(LV>=26)a.push('T 테마');if(LV>=31)a.push('R 초기화');if(LV>=23)a.push('스와이프');$('hint').textContent=a.join(' · ')}
+function hud(){hv();$('sc').textContent=score;$('hi').textContent=best;$('lv').textContent=lvl;$('ln').textContent=sn?sn.length:3;
+ $('cb').textContent=combo;$('md').textContent=(LV>=7?D[diff].n+' ':'')+(wrap?'벽통과':'벽충돌')}
+function burst(p,c,n=12){if(LV<19)return;for(let i=0;i<n;i++){const a=Math.random()*6.28,s=.05+Math.random()*.15;
+ parts.push({x:p.x*S+S/2,y:p.y*S+S/2,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:500,c})}}
+function start(){reset();state='play';beep(660,.15)}
+function die(n){if(LV<4){reset();return}state='over';if(LV>=22)shake=16;beep(110,.5,'sawtooth',.08);
+ if(score>best){best=score;if(LV>=2){store.set('best',best);toast('신기록!')}}
+ if(LV>=30){rank.push(score);rank.sort((a,b)=>b-a);rank=rank.slice(0,5);store.set('rank',rank)}hud()}
+function step(n){procPend(n);
+ if(q.length){const d=q.shift();if(!(d.x==-dir.x&&d.y==-dir.y))dir=d}
+ let h={x:sn[0].x+dir.x,y:sn[0].y+dir.y};const inv=fx.inv>n;
+ if(h.x<0||h.y<0||h.x>=N||h.y>=N){if(wrap||inv){h.x=(h.x+N)%N;h.y=(h.y+N)%N}else return die(n)}
+ if(!inv&&(sn.some(s=>s.x==h.x&&s.y==h.y)||walls.some(s=>s.x==h.x&&s.y==h.y)))return die(n);
+ sn.unshift(h);let grow=false;tick++;
+ if(LV>=21&&music&&tick%3==0)beep(SC[(tick/3)%6|0],.12,'triangle',.025);
+ if(apple&&h.x==apple.x&&h.y==apple.y){
+  if(LV>=18)combo=(n-lastEat<3000)?combo+1:1;lastEat=n;
+  score+=Math.round(10*(fx.x2>n?2:1)*(LV>=18?1+Math.min(combo,5)*.2:1));grow=true;eaten++;beep(520+combo*40,.08);burst(apple,'#ef4444');
+  sp('apple',p=>{apple=p},n);
+  if(LV>=12&&Math.random()<.25&&!gold)sp('gold',(p,a)=>{gold={...p,t:a+5000}},n);
+  if(LV>=13&&Math.random()<.25&&!poison)sp('poison',p=>{poison=p},n);
+  {const T=['slow','inv','x2'].filter((k,i)=>LV>=15+i);if(T.length&&Math.random()<.2&&!items.length){const K=T[Math.random()*T.length|0];sp('item',p=>items.push({...p,k:K}),n)}}
+  const nl=LV>=6?1+Math.floor(eaten/5):1;
+  if(nl>lvl){lvl=nl;toast('레벨 '+lvl+'! 속도 증가 + 장애물');beep(880,.2);
+   for(let i=0;i<(LV>=14?2:0);i++)sp('wall',p=>{if(Math.abs(p.x-sn[0].x)+Math.abs(p.y-sn[0].y)>4)walls.push(p)},n);}
+  if(LV>=27&&combo==5&&!ach.c){ach.c=1;toast('업적: 콤보 5 달성!')}
+ }
+ if(gold){if(n>gold.t)gold=null;else if(h.x==gold.x&&h.y==gold.y){score+=50;grow=true;burst(gold,'#fbbf24',20);beep(988,.2);toast('황금 사과 +50');gold=null}}
+ if(poison&&h.x==poison.x&&h.y==poison.y){burst(poison,'#a855f7');beep(150,.25,'sawtooth');
+  score=Math.max(0,score-5);combo=0;for(let i=0;i<2&&sn.length>3;i++)sn.pop();poison=null;toast('독 사과! 길이 감소')}
+ const k=items.findIndex(i=>i.x==h.x&&i.y==h.y);
+ if(k>=0){const it=items.splice(k,1)[0];fx[it.k]=n+6000;beep(740,.2,'sine');
+  toast({slow:'슬로우 6초',inv:'무적 6초',x2:'점수 2배 6초'}[it.k])}
+ if(!grow)sn.pop();
+ if(LV>=27&&score>=100&&!ach.s){ach.s=1;toast('업적: 100점 돌파!')}
+ if(LV>=27&&sn.length>=15&&!ach.l){ach.l=1;toast('업적: 길이 15!')}
+ hud()}
+function setTheme(){document.body.classList.toggle('light',light);col1=light?'#dbe4ee':'#172033';col2=light?'#cfd9e5':'#1b263b'}
+function R(p,c,pad=2){x.fillStyle=c;x.beginPath();x.roundRect(p.x*S+pad,p.y*S+pad,S-pad*2,S-pad*2,6);x.fill()}
+function dot(p,r,c){x.fillStyle=c;x.beginPath();x.arc(p.x*S+S/2,p.y*S+S/2,r,0,6.28);x.fill()}
+function ov(t,l){x.fillStyle='rgba(8,12,20,.78)';x.fillRect(0,0,480,480);x.fillStyle='#e6edf3';x.textAlign='center';
+ x.font='bold 36px sans-serif';x.fillText(t,240,150);x.font='16px sans-serif';l.forEach((s,i)=>x.fillText(s,240,200+i*28))}
+function draw(n,dt){
+ x.save();x.clearRect(0,0,480,480);
+ if(shake>0){x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake=Math.max(0,shake-dt*.04)}
+ for(let i=0;i<N;i++)for(let j=0;j<N;j++){x.fillStyle=(LV>=10&&(i+j)%2)?col1:col2;x.fillRect(i*S,j*S,S,S)}
+ if(sn){
+  walls.forEach(w=>R(w,'#64748b',1));
+  pend.forEach(e=>{if(!((n/130|0)%2))return;x.globalAlpha=.6;const c={apple:'#ef4444',gold:'#fbbf24',poison:'#a855f7',item:'#38bdf8',wall:'#64748b'}[e.kind];e.kind=='wall'?R(e,c,1):dot(e,9,c);x.globalAlpha=1});
+  const pu=LV>=11?Math.sin(n/150)*1.5:0;
+  if(apple)dot(apple,9+pu,'#ef4444');
+  if(gold){dot(gold,10+pu,'#fbbf24');x.strokeStyle='#fde68a';x.beginPath();
+   x.arc(gold.x*S+S/2,gold.y*S+S/2,11,0,6.28*Math.max(0,(gold.t-n)/5000));x.stroke()}
+  if(poison){dot(poison,9,'#a855f7');x.fillStyle='#fff';x.font='bold 13px sans-serif';x.textAlign='center';x.fillText('×',poison.x*S+S/2,poison.y*S+S/2+5)}
+  items.forEach(i=>{R(i,{slow:'#38bdf8',inv:'#f472b6',x2:'#34d399'}[i.k],3);x.fillStyle='#08111c';x.font='bold 12px sans-serif';
+   x.textAlign='center';x.fillText({slow:'S',inv:'I',x2:'x2'}[i.k],i.x*S+S/2,i.y*S+S/2+4)});
+  const inv=fx.inv>n;
+  sn.forEach((s,i)=>{x.globalAlpha=LV>=29&&inv&&((n/100|0)%2)?.45:1;R(s,LV>=9?`hsl(${150-i*4},70%,${i?45:55}%)`:'#22c55e',i?2:1)});x.globalAlpha=1;
+  const h=sn[0],ex=dir.y?6:0,ey=dir.x?6:0;
+  if(LV>=8)[-1,1].forEach(m=>{const p={x:h.x*S+S/2+dir.x*5+ex*m*.9*(dir.y?1:0)+0,y:h.y*S+S/2+dir.y*5+ey*m*(dir.x?1:0)};
+   x.fillStyle='#fff';x.beginPath();x.arc(p.x,p.y,3.5,0,6.28);x.fill();x.fillStyle='#000';x.beginPath();x.arc(p.x+dir.x*1.5,p.y+dir.y*1.5,1.6,0,6.28);x.fill()});
+  parts=parts.filter(p=>(p.l-=dt)>0);parts.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;x.globalAlpha=p.l/500;x.fillStyle=p.c;x.fillRect(p.x,p.y,4,4)});x.globalAlpha=1;
+  /* 상태 표시 */
+  let ty=8;x.textAlign='left';x.font='12px sans-serif';
+  if(LV>=28)[['slow','슬로우','#38bdf8'],['inv','무적','#f472b6'],['x2','2배','#34d399']].forEach(([k,t,c])=>{if(fx[k]>n){x.fillStyle=c;x.fillText(t+' '+((fx[k]-n)/1000).toFixed(1)+'s',8,ty+10);ty+=16}});
+ }
+ x.restore();
+ if(state=='menu')ov('SNAKE UPGRADE',['Space: 시작',...(LV>=7?['1/2/3: 난이도 ['+D[diff].n+']']:[]),...(LV>=5?['B: 벽 통과 ['+(wrap?'ON':'OFF')+']']:[]),...(LV>=2?['최고 점수: '+best]:[]),...(LV>=31?['R: 기록 초기화']:[])]);
+ if(state=='pause')ov('일시정지',['Space 또는 P: 계속']);
+ if(state=='over')ov('GAME OVER',['점수 '+score+(LV>=2?' / 최고 '+best:''),...(LV>=30?['--- TOP 5 ---',...rank.map((r,i)=>(i+1)+'위  '+r)]:[]),'Space: 다시 시작',...(LV>=31?['R: 기록 초기화']:[])]);
+}
+let last=performance.now(),acc=0;
+function loop(n){const dt=Math.min(100,n-last);last=n;
+ if(state=='play'){acc+=dt;const sp=Math.max(40,D[diff].s-(lvl-1)*7)*(fx.slow>n?1.6:1);
+  while(acc>=sp&&state=='play'){acc-=sp;step(n)}}
+ draw(n,dt);requestAnimationFrame(loop)}
+function turn(d){if(state=='play'&&q.length<(LV>=24?2:1))q.push(d)}
+const KM={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1],ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0]};
+addEventListener('keydown',e=>{const k=e.key.length==1?e.key.toLowerCase():e.key;
+ if(KM[k]&&(LV>=25||k.startsWith('Arrow'))){e.preventDefault();turn({x:KM[k][0],y:KM[k][1]})}
+ else if(LV>=3&&(k==' '||k=='p')){e.preventDefault();
+  if(state=='menu'||state=='over'){if(k==' ')start()}else if(state=='play')state='pause';else if(state=='pause')state='play'}
+ else if(LV>=7&&'123'.includes(k)&&state!='play'){diff=+k-1;hud()}
+ else if(LV>=5&&k=='b'&&state!='play'){wrap=!wrap;hud()}
+ else if(LV>=20&&k=='m'){sound=!sound;toast('소리 '+(sound?'ON':'OFF'))}
+ else if(LV>=21&&k=='n'){music=!music;toast('음악 '+(music?'ON':'OFF'))}
+ else if(LV>=26&&k=='t'){light=!light;setTheme()}
+ else if(LV>=31&&k=='r'){if(state=='play'||state=='pause'){reset();state='play';toast('점수 초기화: 새 게임')}else{best=0;rank=[];store.set('best',0);store.set('rank',[]);hud();toast('최고점수·랭킹 기록 초기화')}}});
+let t0=null;if(LV>=23){
+C.addEventListener('touchstart',e=>{t0=e.touches[0];if(state!='play'&&state!='pause')start();else if(state=='pause')state='play'},{passive:true});
+C.addEventListener('touchend',e=>{if(!t0)return;const t=e.changedTouches[0],dx=t.clientX-t0.clientX,dy=t.clientY-t0.clientY;
+ if(Math.max(Math.abs(dx),Math.abs(dy))>20)turn(Math.abs(dx)>Math.abs(dy)?{x:Math.sign(dx),y:0}:{x:0,y:Math.sign(dy)});t0=null});}
+reset();setTheme();buildHint();requestAnimationFrame(loop);
+</script></body></html>
